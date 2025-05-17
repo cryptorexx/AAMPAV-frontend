@@ -20,7 +20,7 @@ export default function App() {
       const res = await fetch(`${API_BASE_URL}/status`);
       const data = await res.json();
       setStatus(data.status || 'Unknown');
-    } catch (err) {
+    } catch {
       setStatus('Error');
     }
   };
@@ -30,7 +30,7 @@ export default function App() {
       const res = await fetch(`${API_BASE_URL}/logs`);
       const data = await res.json();
       setLogs(data.logs || []);
-    } catch (err) {
+    } catch {
       setLogs(['Error fetching logs']);
     }
   };
@@ -40,7 +40,7 @@ export default function App() {
       const res = await fetch(`${API_BASE_URL}/brokers`);
       const data = await res.json();
       setBrokers(data.brokers || []);
-    } catch (err) {
+    } catch {
       setBrokers(['Error fetching brokers']);
     }
   };
@@ -49,35 +49,57 @@ export default function App() {
     try {
       await fetch(`${API_BASE_URL}/start-bot`, { method: 'POST' });
       fetchStatus();
-    } catch (err) {
+    } catch {
       alert('Error starting bot');
     }
   };
 
+  const stopBot = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/stop-bot`, { method: 'POST' });
+      fetchStatus();
+    } catch {
+      alert('Error stopping bot');
+    }
+  };
+
+  const depositFunds = async () => {
+    alert('Deposit functionality not implemented yet.');
+  };
+
+  const collectPayments = async () => {
+    alert('Collect payments functionality not implemented yet.');
+  };
+
   return (
-    <main className="p-6 space-y-6 text-white bg-black min-h-screen">
-      <h1 className="text-2xl font-bold">AAMPAV Dashboard</h1>
+    <main className="max-w-7xl mx-auto p-4 space-y-6 text-gray-100 bg-gray-900 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-center">AAMPAV Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardContent className="p-4">
-            <p className="font-semibold">Bot Status</p>
-            <p className="text-lg text-green-400">{status}</p>
-            <Button onClick={startBot} className="mt-2">Start Bot</Button>
+          <CardContent>
+            <p className="font-semibold text-lg mb-2">Bot Status</p>
+            <p className={`text-xl font-mono mb-4 ${status === 'Running' ? 'text-green-400' : 'text-red-400'}`}>{status}</p>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={depositFunds} className="bg-blue-600 hover:bg-blue-700">Deposit</Button>
+              <Button onClick={startBot} className="bg-green-600 hover:bg-green-700">Start Bot</Button>
+              <Button onClick={stopBot} className="bg-red-600 hover:bg-red-700">Stop Bot</Button>
+              <Button onClick={collectPayments} className="bg-yellow-600 hover:bg-yellow-700">Collect Payments</Button>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <p className="font-semibold">Daily Profit</p>
-            <p className="text-lg">$0.00</p>
+          <CardContent>
+            <p className="font-semibold text-lg mb-2">Daily Profit</p>
+            <p className="text-2xl">$0.00</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <p className="font-semibold">Profit Signals</p>
-            <ul className="text-sm list-disc ml-5 mt-1">
+          <CardContent>
+            <p className="font-semibold text-lg mb-2">Profit Signals</p>
+            <ul className="list-disc list-inside text-sm space-y-1">
               <li>BTC/USD +2.1%</li>
               <li>ETH/USD +1.4%</li>
             </ul>
@@ -85,9 +107,9 @@ export default function App() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardContent className="p-4">
+          <CardContent>
             <p className="font-semibold mb-2">Market Overview</p>
             <div className="space-y-1">
               <div className="flex justify-between"><span>BTC/USD</span><span>$62,000</span></div>
@@ -98,15 +120,17 @@ export default function App() {
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent>
             <p className="font-semibold mb-2">Candlestick Chart</p>
-            <div className="w-full h-40 bg-gray-800 rounded flex items-center justify-center text-gray-500">[Chart Placeholder]</div>
+            <div className="w-full h-40 bg-gray-800 rounded flex items-center justify-center text-gray-500">
+              [Chart Placeholder]
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent>
           <p className="font-semibold mb-2">Asset List</p>
           <div className="grid grid-cols-4 font-semibold text-sm mb-1">
             <span>Asset</span>
@@ -130,7 +154,7 @@ export default function App() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent>
           <p className="font-semibold mb-2">Connected Brokers</p>
           <ul className="list-disc ml-5 text-sm text-gray-300">
             {brokers.map((broker, i) => <li key={i}>{broker}</li>)}
@@ -139,10 +163,10 @@ export default function App() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent>
           <p className="font-semibold mb-2">Bot Logs</p>
           <ul className="text-xs text-gray-400 max-h-40 overflow-y-auto">
-            {logs.map((log, i) => <li key={i}>• {log}</li>)}
+            {logs.map((log, i) => <li key={i} className="mb-1">• {log}</li>)}
           </ul>
         </CardContent>
       </Card>
