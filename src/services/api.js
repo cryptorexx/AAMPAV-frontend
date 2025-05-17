@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://aampav-backend.onrender.com';
+const API_BASE_URL = 'https://aampav-backend.onrender.com';
 
 export const getStatus = () => axios.get(`${BASE_URL}/status`);
 export const startBot = () => axios.post(`${BASE_URL}/start-bot`);
