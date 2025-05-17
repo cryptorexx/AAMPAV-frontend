@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Card({ children }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg shadow p-4">
+    <div className="bg-gray-800 rounded shadow-md border border-gray-700">
       {children}
     </div>
   );
@@ -10,7 +10,7 @@ export function Card({ children }) {
 
 export function CardContent({ children, className = '' }) {
   return (
-    <div className={`text-white ${className}`}>
+    <div className={`p-4 ${className}`}>
       {children}
     </div>
   );
