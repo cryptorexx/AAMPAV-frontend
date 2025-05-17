@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react'; import { Card, CardContent } from '@/components/ui/card'; import { Button } from '@/components/ui/button';
-const API_BASE_URL = 'https://aampav-backend.onrender.com';
-export default function App() { const [status, setStatus] = useState('Disconnected'); const [logs, setLogs] = useState([]); const [brokers, setBrokers] = useState([]);
+import React, { useEffect, useState } 
+from 'react'; import { Card, CardContent } 
+from '@/components/ui/card'; import { Button } from '@/components/ui/button';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://aampav-backend.onrender.com';
+export default function App() { const [status, setStatus] = useState('Disconnected'); 
+const [logs, setLogs] = useState([]); const [brokers, setBrokers] = useState([]);
 
 useEffect(() => { fetchStatus(); fetchLogs(); fetchBrokers(); }, []);
 
