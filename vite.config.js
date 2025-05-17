@@ -10,5 +10,3 @@ export default defineConfig({
     },
   },
 });
-
-npm install --save-dev path
