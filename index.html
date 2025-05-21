@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAMPAV Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>AAMPAV Trading Dashboard</h1>
+
+    <section id="status">
+      <h2>Bot Status:</h2>
+      <p class="value">Loading...</p>
+      <button onclick="startBot()">Start Bot</button>
+      <button onclick="stopBot()">Stop Bot</button>
+    </section>
+
+    <section id="brokers">
+      <h2>Connected Brokers</h2>
+      <ul></ul>
+    </section>
+
+    <section id="logs">
+      <h2>Bot Logs</h2>
+      <pre></pre>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
