@@ -1,0 +1,33 @@
+body {
+  background: #111;
+  color: #eee;
+  font-family: monospace;
+  padding: 2rem;
+}
+
+h1, h2 {
+  color: #5ff;
+}
+
+section {
+  margin-top: 2rem;
+}
+
+button {
+  margin-right: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: #333;
+  color: #fff;
+  border: 1px solid #5ff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #5ff;
+  color: #000;
+}
+
+.value {
+  font-weight: bold;
+  color: #0f0;
+}
