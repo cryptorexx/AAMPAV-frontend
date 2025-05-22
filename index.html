@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AAMPAV Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
   <div class="layout">
     <!-- Sidebar -->
@@ -16,11 +24,11 @@
       </div>
     </aside>
 
-    <!-- Main dashboard -->
+    <!-- Dashboard -->
     <main class="dashboard">
       <section class="chart">
         <h2>Candlestick Chart</h2>
-        <div id="chart" class="chart-box"></div>
+        <div id="chart" class="chart-box">Loading chart...</div>
       </section>
 
       <section class="profit">
@@ -30,21 +38,14 @@
 
       <section class="signals">
         <h2>Profit Signals</h2>
-        <ul id="signals">
-          <li>Loading...</li>
-        </ul>
+        <ul id="signals"><li>Loading...</li></ul>
       </section>
 
       <section class="market">
         <h2>Market Overview</h2>
         <table id="market-table">
           <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Price</th>
-              <th>Change</th>
-              <th>Volume</th>
-            </tr>
+            <tr><th>Asset</th><th>Price</th><th>Change</th><th>Volume</th></tr>
           </thead>
           <tbody>
             <tr><td colspan="4">Loading...</td></tr>
@@ -54,14 +55,13 @@
 
       <section class="brokers">
         <h2>Connected Brokers</h2>
-        <ul id="brokers">
-          <li>Loading...</li>
-        </ul>
+        <ul id="brokers"><li>Loading...</li></ul>
       </section>
     </main>
   </div>
 
-  <!-- Load chart lib FIRST, then app logic -->
+  <!-- Order matters -->
   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
   <script src="script.js"></script>
 </body>
+</html>
