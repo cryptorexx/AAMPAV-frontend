@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AAMPAV Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
 <body>
   <div class="layout">
     <!-- Sidebar -->
@@ -28,12 +20,9 @@
     <main class="dashboard">
       <section class="chart">
         <h2>Candlestick Chart</h2>
-        <div class="chart-box">[Chart Placeholder]</div>
+        <div id="chart" class="chart-box"></div>
       </section>
 
-      <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-<script src="script.js"></script>
-      
       <section class="profit">
         <h2>Daily Profit</h2>
         <div id="daily-profit">$0.00</div>
@@ -72,6 +61,7 @@
     </main>
   </div>
 
+  <!-- Load chart lib FIRST, then app logic -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
   <script src="script.js"></script>
 </body>
-</html>
