@@ -1,5 +1,44 @@
 const BASE = 'https://aampav-backend.onrender.com';
 
+function initChart() {
+  const chartEl = document.getElementById('chart');
+  const chart = LightweightCharts.createChart(chartEl, {
+    width: chartEl.clientWidth,
+    height: 200,
+    layout: {
+      background: { color: '#222' },
+      textColor: '#DDD',
+    },
+    grid: {
+      vertLines: { color: '#333' },
+      horzLines: { color: '#333' },
+    },
+    timeScale: {
+      timeVisible: true,
+      secondsVisible: false,
+    },
+  });
+
+  const candleSeries = chart.addCandlestickSeries({
+    upColor: '#26a69a',
+    downColor: '#ef5350',
+    borderVisible: false,
+    wickUpColor: '#26a69a',
+    wickDownColor: '#ef5350',
+  });
+
+  fetch(`${API_BASE}/candles`)
+    .then(res => res.json())
+    .then(candles => {
+      candleSeries.setData(candles);
+    })
+    .catch(err => {
+      console.error('Chart fetch failed:', err);
+    });
+}
+
+initChart(); // Make sure this is called
+
 function updateStatus() {
   fetch(`${BASE}/status`)
     .then(res => res.json())
