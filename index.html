@@ -78,25 +78,24 @@
     const BACKEND_URL = "https://aampav-backend.onrender.com";
 
     async function loadCandlestick() {
-      const res = await fetch(`${BACKEND_URL}/candlestick?symbol=AAPL`);
-      const { candlesticks } = await res.json();
-      const chart = LightweightCharts.createChart(document.getElementById('candlestick-chart'), {
-        width: 800,
-        height: 400,
-        layout: { backgroundColor: '#111', textColor: '#fff' },
-        grid: { vertLines: { color: '#222' }, horzLines: { color: '#222' } },
-        timeScale: { timeVisible: true },
-      });
-      const series = chart.addCandlestickSeries();
-      series.setData(candlesticks.map(d => ({
-        time: new Date(d.Date).getTime() / 1000,
-        open: d.Open,
-        high: d.High,
-        low: d.Low,
-        close: d.Close
-      })));
-    }
-
+  const res = await fetch(`${BACKEND_URL}/candles`);
+  const { candlesticks } = await res.json();  // Adjust if this is just an array (not wrapped in an object)
+  const chart = LightweightCharts.createChart(document.getElementById('candlestick-chart'), {
+    width: 800,
+    height: 400,
+    layout: { backgroundColor: '#111', textColor: '#fff' },
+    grid: { vertLines: { color: '#222' }, horzLines: { color: '#222' } },
+    timeScale: { timeVisible: true },
+  });
+  const series = chart.addCandlestickSeries();
+  series.setData(candlesticks.map(d => ({
+    time: new Date(d.Date).getTime() / 1000,
+    open: d.Open,
+    high: d.High,
+    low: d.Low,
+    close: d.Close
+  })));
+}
     async function loadMarketOverview() {
       const symbols = ["AAPL", "TSLA", "MSFT", "GOOG"];
       const body = await Promise.all(symbols.map(async s => {
