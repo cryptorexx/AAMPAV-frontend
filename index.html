@@ -107,7 +107,7 @@
     }
 
     async function loadSymbolicCandles() {
-  const res = await fetch(`${BACKEND_URL}/symbolic-candles`);
+  const res = await fetch(`${BACKEND}/symbolic-candles`);
   const data = await res.json(); // Format: [{symbol: "BTC", trend: 3}, ...]
 
   const container = document.getElementById('symbolic-candles');
