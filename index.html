@@ -193,9 +193,13 @@
     }
 
     // Initial load
-    loadSymbolicCandles();
-    refreshAll();
-    setInterval(refreshAll, 5000);
+    setInterval(() => {
+  updateProfit();
+  loadSignals();
+  loadLogs();
+  loadSymbolicCandles();
+}, 10000);
+
   </script>
 </body>
 </html>
