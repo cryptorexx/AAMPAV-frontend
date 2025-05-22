@@ -37,8 +37,6 @@ function initChart() {
     });
 }
 
-initChart(); // Make sure this is called
-
 function updateStatus() {
   fetch(`${BASE}/status`)
     .then(res => res.json())
@@ -150,3 +148,5 @@ setInterval(() => {
   updateMarket();
   updateProfit();
 }, 15000);
+
+initChart();
