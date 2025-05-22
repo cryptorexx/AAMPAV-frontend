@@ -1,77 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AAMPAV Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>AAMPAV Trading Bot</title>
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/htm@3.1.1/react/index.module.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
 </head>
-<body>
-  <div class="layout">
+<body class="bg-gray-900 text-white">
+
+  <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside class="sidebar">
-      <h1>AAMPAV</h1>
-      <div id="bot-status" class="status">Status: ...</div>
-      <div class="controls">
-        <button onclick="deposit()">Deposit</button>
-        <button onclick="startBot()">Start Bot</button>
-        <button onclick="stopBot()">Stop Bot</button>
-        <button onclick="collect()">Collect</button>
+    <div class="w-1/5 bg-gray-800 p-4 space-y-4">
+      <h2 class="text-xl font-bold">AAMPAV Bot</h2>
+      <nav class="space-y-2">
+        <a href="#chart" class="block hover:text-green-400">Candlestick</a>
+        <a href="#overview" class="block hover:text-green-400">Market Overview</a>
+        <a href="#profit" class="block hover:text-green-400">Profit</a>
+        <a href="#signals" class="block hover:text-green-400">Signals</a>
+        <a href="#brokers" class="block hover:text-green-400">Brokers</a>
+        <a href="#logs" class="block hover:text-green-400">Logs</a>
+      </nav>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="w-4/5 p-6 space-y-6 overflow-y-scroll">
+      <!-- Bot Status -->
+      <div class="flex items-center gap-4">
+        <span id="bot-status" class="text-green-400 font-bold">STATUS: IDLE</span>
+        <button onclick="startBot()" class="bg-green-600 px-4 py-2 rounded">Start Bot</button>
+        <button onclick="stopBot()" class="bg-red-600 px-4 py-2 rounded">Stop Bot</button>
       </div>
-      <div class="logs">
-        <h2>Logs</h2>
-        <pre id="logs">Loading logs...</pre>
+
+      <!-- Daily Profit -->
+      <div id="profit" class="text-lg font-bold">Daily Profit: $<span id="daily-profit">0.00</span></div>
+
+      <!-- Candlestick Chart -->
+      <div>
+        <h3 class="text-xl font-semibold mb-2" id="chart">Symbolic Candlestick Chart</h3>
+        <div id="candlestick-chart" style="height: 400px;"></div>
       </div>
-    </aside>
 
-    <!-- Main dashboard -->
-    <main class="dashboard">
-      <section class="chart">
-        <h2>Candlestick Chart</h2>
-        <div class="chart-box">[Chart Placeholder]</div>
-      </section>
-
-      <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-<script src="script.js"></script>
-      
-      <section class="profit">
-        <h2>Daily Profit</h2>
-        <div id="daily-profit">$0.00</div>
-      </section>
-
-      <section class="signals">
-        <h2>Profit Signals</h2>
-        <ul id="signals">
-          <li>Loading...</li>
-        </ul>
-      </section>
-
-      <section class="market">
-        <h2>Market Overview</h2>
-        <table id="market-table">
+      <!-- Market Overview Table -->
+      <div>
+        <h3 class="text-xl font-semibold mb-2" id="overview">Market Overview</h3>
+        <table class="table-auto w-full bg-gray-800 rounded">
           <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Price</th>
-              <th>Change</th>
-              <th>Volume</th>
-            </tr>
+            <tr><th class="px-4 py-2">Symbol</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Change %</th></tr>
           </thead>
-          <tbody>
-            <tr><td colspan="4">Loading...</td></tr>
-          </tbody>
+          <tbody id="market-body"></tbody>
         </table>
-      </section>
+      </div>
 
-      <section class="brokers">
-        <h2>Connected Brokers</h2>
-        <ul id="brokers">
-          <li>Loading...</li>
-        </ul>
-      </section>
-    </main>
+      <!-- Profit Signals -->
+      <div>
+        <h3 class="text-xl font-semibold mb-2" id="signals">Profit Signals</h3>
+        <ul id="signal-list" class="list-disc pl-5 text-green-300"></ul>
+      </div>
+
+      <!-- Connected Brokers -->
+      <div>
+        <h3 class="text-xl font-semibold mb-2" id="brokers">Connected Brokers</h3>
+        <ul id="broker-list" class="list-disc pl-5 text-blue-300"></ul>
+      </div>
+
+      <!-- Logs Console -->
+      <div>
+        <h3 class="text-xl font-semibold mb-2" id="logs">Bot Logs</h3>
+        <pre id="logs-console" class="bg-black p-3 rounded h-48 overflow-y-scroll text-green-400"></pre>
+      </div>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const BACKEND_URL = "https://aampav-backend.onrender.com";
+
+    async function loadCandlestick() {
+      const res = await fetch(`${BACKEND_URL}/candlestick?symbol=AAPL`);
+      const { candlesticks } = await res.json();
+      const chart = LightweightCharts.createChart(document.getElementById('candlestick-chart'), {
+        width: 800,
+        height: 400,
+        layout: { backgroundColor: '#111', textColor: '#fff' },
+        grid: { vertLines: { color: '#222' }, horzLines: { color: '#222' } },
+        timeScale: { timeVisible: true },
+      });
+      const series = chart.addCandlestickSeries();
+      series.setData(candlesticks.map(d => ({
+        time: new Date(d.Date).getTime() / 1000,
+        open: d.Open,
+        high: d.High,
+        low: d.Low,
+        close: d.Close
+      })));
+    }
+
+    async function loadMarketOverview() {
+      const symbols = ["AAPL", "TSLA", "MSFT", "GOOG"];
+      const body = await Promise.all(symbols.map(async s => {
+        const r = await fetch(`${BACKEND_URL}/price?symbol=${s}`);
+        const d = await r.json();
+        return `<tr><td class="px-4 py-2">${s}</td><td class="px-4 py-2">${d.price}</td><td class="px-4 py-2">${d.change_percent.toFixed(2)}%</td></tr>`;
+      }));
+      document.getElementById("market-body").innerHTML = body.join("");
+    }
+
+    async function updateProfit() {
+      const res = await fetch(`${BACKEND_URL}/profit-today`);
+      const data = await res.json();
+      document.getElementById("daily-profit").innerText = data.profit.toFixed(2);
+    }
+
+    async function loadSignals() {
+      const res = await fetch(`${BACKEND_URL}/signals`);
+      const { signals } = await res.json();
+      document.getElementById("signal-list").innerHTML = signals.map(s => `<li>${s}</li>`).join("");
+    }
+
+    async function loadBrokers() {
+      const res = await fetch(`${BACKEND_URL}/brokers`);
+      const { brokers } = await res.json();
+      document.getElementById("broker-list").innerHTML = brokers.map(b => `<li>${b}</li>`).join("");
+    }
+
+    async function loadLogs() {
+      const res = await fetch(`${BACKEND_URL}/logs`);
+      const { logs } = await res.json();
+      document.getElementById("logs-console").innerText = logs.join("\n");
+    }
+
+    async function startBot() {
+      await fetch(`${BACKEND_URL}/start-bot`, { method: 'POST' });
+      document.getElementById("bot-status").innerText = "STATUS: RUNNING";
+    }
+
+    async function stopBot() {
+      await fetch(`${BACKEND_URL}/stop-bot`, { method: 'POST' });
+      document.getElementById("bot-status").innerText = "STATUS: IDLE";
+    }
+
+    // Load everything
+    loadCandlestick();
+    loadMarketOverview();
+    updateProfit();
+    loadSignals();
+    loadBrokers();
+    loadLogs();
+    setInterval(() => {
+      updateProfit();
+      loadSignals();
+      loadLogs();
+    }, 5000);
+  </script>
 </body>
 </html>
