@@ -106,11 +106,26 @@
       document.getElementById('bot-status').textContent = "Status: " + data.status;
     }
 
-    async function loadLogs() {
-      const res = await fetch(`${BACKEND}/logs`);
-      const data = await res.json();
-      document.getElementById('logs').textContent = data.logs.join("\n");
-    }
+    async function loadSymbolicCandles() {
+  const res = await fetch(`${BACKEND_URL}/symbolic-candles`);
+  const data = await res.json(); // Format: [{symbol: "BTC", trend: 3}, ...]
+
+  const container = document.getElementById('symbolic-candles');
+  container.innerHTML = '';
+
+  data.forEach(d => {
+    const color = d.trend > 0 ? 'bg-green-500' : 'bg-red-500';
+    const height = Math.min(10, Math.abs(d.trend)) * 4;
+
+    const el = document.createElement('div');
+    el.className = 'flex flex-col items-center';
+    el.innerHTML = `
+      <div class="w-2 ${color}" style="height: ${height}px;"></div>
+      <span class="text-xs mt-1">${d.symbol}</span>
+    `;
+    container.appendChild(el);
+  });
+}
 
     async function loadProfit() {
       const res = await fetch(`${BACKEND}/profit-today`);
