@@ -132,6 +132,31 @@ function collect() {
   alert('Collect payments functionality not implemented.');
 }
 
+function getCandleEmoji(candle) {
+    if (candle.close > candle.open) return '📈';  // green candle
+    if (candle.close < candle.open) return '📉';  // red candle
+    return '➖'; // neutral
+}
+
+function renderCandlestickBar(candles) {
+    const bar = document.getElementById('candlestick-bar');
+    const emojis = candles.map(getCandleEmoji).join('');
+    bar.textContent = `Market Candles: ${emojis}`;
+}
+
+async function fetchCandlesticks() {
+    try {
+        const res = await fetch("https://aampav-backend.onrender.com/api/candlesticks");
+        const data = await res.json();
+        renderCandlestickBar(data);
+    } catch (err) {
+        console.error("Failed to fetch candlesticks", err);
+    }
+}
+
+setInterval(fetchCandlesticks, 5000); // update every 5 seconds
+fetchCandlesticks(); // initial load
+
 // Init
 updateStatus();
 updateLogs();
