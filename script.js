@@ -27,7 +27,7 @@ function initChart() {
     wickDownColor: '#ef5350',
   });
 
-  fetch(`${API_BASE}/candles`)
+  fetch(`${BASE}/candles`)
     .then(res => res.json())
     .then(candles => {
       candleSeries.setData(candles);
@@ -111,7 +111,6 @@ function updateMarket() {
 }
 
 function updateProfit() {
-  // Static for now, wire to real backend later
   document.getElementById('daily-profit').textContent = '$172.34';
 }
 
@@ -132,27 +131,30 @@ function collect() {
   alert('Collect payments functionality not implemented.');
 }
 
+// 📊 Real candlestick symbol rendering
 function getCandleEmoji(candle) {
-    if (candle.close > candle.open) return '📈';  // green candle
-    if (candle.close < candle.open) return '📉';  // red candle
-    return '➖'; // neutral
-}
-
-function getCandleEmoji(candle) {
-    if (candle.close > candle.open) return '📈';
-    if (candle.close < candle.open) return '📉';
-    return '➖';
+  if (candle.close > candle.open) return '📈';
+  if (candle.close < candle.open) return '📉';
+  return '➖';
 }
 
 function renderCandlestickBar(candles) {
-    const bar = document.getElementById('candlestick-bar');
-    let symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
-    bar.textContent = symbols;
-}
+  const bar = document.getElementById('candlestick-bar');
+  if (!bar || !candles || candles.length === 0) return;
+
+  const symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
+  bar.textContent = symbols;
 }
 
-setInterval(fetchCandlesticks, 5000); // update every 5 seconds
-fetchCandlesticks(); // initial load
+async function fetchCandlesticks() {
+  try {
+    const res = await fetch(`${BASE}/api/candlesticks`);
+    const data = await res.json();
+    renderCandlestickBar(data);
+  } catch (err) {
+    console.error("Failed to fetch candlesticks", err);
+  }
+}
 
 // Init
 updateStatus();
@@ -161,6 +163,7 @@ updateBrokers();
 updateSignals();
 updateMarket();
 updateProfit();
+fetchCandlesticks();
 
 setInterval(() => {
   updateStatus();
@@ -170,5 +173,7 @@ setInterval(() => {
   updateMarket();
   updateProfit();
 }, 15000);
+
+setInterval(fetchCandlesticks, 5000);
 
 initChart();
