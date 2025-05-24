@@ -141,7 +141,6 @@ function getCandleEmoji(candle) {
 function renderCandlestickBar(candles) {
   const bar = document.getElementById('candlestick-bar');
   if (!bar || !candles || candles.length === 0) return;
-
   const symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
   bar.textContent = symbols;
 }
