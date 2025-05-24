@@ -156,23 +156,24 @@ async function fetchCandlesticks() {
 }
 
 // Init
-updateStatus();
-updateLogs();
-updateBrokers();
-updateSignals();
-updateMarket();
-updateProfit();
-fetchCandlesticks();
-
-setInterval(() => {
+window.addEventListener('DOMContentLoaded', () => {
   updateStatus();
   updateLogs();
   updateBrokers();
   updateSignals();
   updateMarket();
   updateProfit();
-}, 15000);
+  fetchCandlesticks();
 
-setInterval(fetchCandlesticks, 5000);
+  setInterval(() => {
+    updateStatus();
+    updateLogs();
+    updateBrokers();
+    updateSignals();
+    updateMarket();
+    updateProfit();
+  }, 15000);
 
-initChart();
+  setInterval(fetchCandlesticks, 5000);
+  initChart();
+});
