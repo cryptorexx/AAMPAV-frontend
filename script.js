@@ -138,20 +138,16 @@ function getCandleEmoji(candle) {
     return '➖'; // neutral
 }
 
-function renderCandlestickBar(candles) {
-    const bar = document.getElementById('candlestick-bar');
-    const emojis = candles.map(getCandleEmoji).join('');
-    bar.textContent = `Market Candles: ${emojis}`;
+function getCandleEmoji(candle) {
+    if (candle.close > candle.open) return '📈';
+    if (candle.close < candle.open) return '📉';
+    return '➖';
 }
 
-async function fetchCandlesticks() {
-    try {
-        const res = await fetch("https://aampav-backend.onrender.com/api/candlesticks");
-        const data = await res.json();
-        renderCandlestickBar(data);
-    } catch (err) {
-        console.error("Failed to fetch candlesticks", err);
-    }
+function renderCandlestickBar(candles) {
+    const bar = document.getElementById('candlestick-bar');
+    let symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
+    bar.textContent = symbols;
 }
 
 setInterval(fetchCandlesticks, 5000); // update every 5 seconds
