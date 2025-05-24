@@ -149,6 +149,7 @@ function renderCandlestickBar(candles) {
     let symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
     bar.textContent = symbols;
 }
+}
 
 setInterval(fetchCandlesticks, 5000); // update every 5 seconds
 fetchCandlesticks(); // initial load
