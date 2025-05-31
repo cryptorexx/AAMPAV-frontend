@@ -1,31 +1,37 @@
+<!-- collect.html -->
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Collect - AAMPAV</title>
+  <meta charset="UTF-8">
+  <title>Collect Profits - AAMPAV</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body { background: #0b0f1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
-    div { background: #111; padding: 2rem; border-radius: 12px; box-shadow: 0 0 20px #000; text-align: center; }
-    button { padding: 0.6rem; width: 100%; background: #26a69a; color: white; font-weight: bold; border: none; border-radius: 8px; margin-top: 1rem; }
-    .msg { margin-top: 1rem; }
+    main { padding: 3rem; text-align: center; color: #ddd; }
+    button { padding: 0.6rem; font-size: 1rem; border-radius: 8px; border: none; background: #26a69a; color: white; margin-top: 1rem; }
+    .info { margin-top: 1rem; font-size: 1.2rem; }
   </style>
 </head>
 <body>
-  <div>
-    <h2>Collect Profits</h2>
-    <button onclick="collect()">Collect</button>
-    <div class="msg" id="msg"></div>
-  </div>
+  <main>
+    <h2>Collect Earnings</h2>
+    <div class="info" id="profit">Checking balance...</div>
+    <button onclick="collectNow()">Collect Now</button>
+  </main>
 
   <script>
-    async function collect() {
+    async function collectNow() {
       const res = await fetch('https://aampav-backend.onrender.com/pay?amount=999', {
         method: 'POST',
         credentials: 'include'
       });
       const data = await res.json();
-      document.getElementById('msg').textContent = res.ok ? '✅ Collected successfully' : (data.error || '❌ Collection failed');
+      document.getElementById('profit').textContent = res.ok
+        ? '✅ Sent to your wallet!'
+        : (data.error || '❌ Collection failed');
     }
+
+    // Optional: display mock split balance
+    document.getElementById('profit').textContent = '$428.77 available to collect';
   </script>
 </body>
 </html>
