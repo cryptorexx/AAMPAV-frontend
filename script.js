@@ -161,22 +161,25 @@ function updateModeDisplay() {
   fetch(`${BASE}/mode`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
-      document.getElementById('current-mode').textContent = data.mode;
-    })
-    .catch(() => {
-      document.getElementById('current-mode').textContent = 'Unknown';
+      const btn = document.getElementById('mode-switch');
+      if (!btn) return;
+      if (data.mode === 'DEMO') {
+        btn.textContent = 'DEMO';
+        btn.style.background = 'grey';
+      } else {
+        btn.textContent = 'REAL';
+        btn.style.background = 'dodgerblue';
+      }
     });
 }
 
 function toggleMode() {
-  const current = document.getElementById('current-mode').textContent.toLowerCase();
-  const newMode = current === 'demo' ? 'live' : 'demo';
-
-  fetch(`${BASE}/mode?mode=${newMode}`, { credentials: 'include' })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById('current-mode').textContent = data.mode;
-    });
+  const current = document.getElementById('mode-switch').textContent;
+  const newMode = current === 'DEMO' ? 'live' : 'demo';
+  fetch(`${BASE}/mode?mode=${newMode}`, {
+    method: 'POST',
+    credentials: 'include'
+  }).then(updateModeDisplay);
 }
 
 // Init
