@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Deposit - AAMPAV</title>
+  <style>
+    body { background: #0b0f1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+    form { background: #111; padding: 2rem; border-radius: 12px; box-shadow: 0 0 20px #000; }
+    input, button { display: block; margin: 1rem 0; padding: 0.6rem; width: 100%; border-radius: 8px; border: none; }
+    button { background: #26a69a; color: white; font-weight: bold; }
+    .msg { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <form id="deposit-form">
+    <h2>Deposit Funds</h2>
+    <input type="number" id="amount" placeholder="Amount in $" required min="1" />
+    <button type="submit">Deposit</button>
+    <div class="msg" id="msg"></div>
+  </form>
+
+  <script>
+    document.getElementById('deposit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const msg = document.getElementById('msg');
+
+      const res = await fetch(`https://aampav-backend.onrender.com/pay?amount=${amount}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+      msg.textContent = res.ok ? '✅ Deposit successful!' : (data.error || '❌ Failed to deposit');
+    });
+  </script>
+</body>
+</html>
