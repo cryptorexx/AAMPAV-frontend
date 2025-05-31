@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - AAMPAV</title>
+  <style>
+    body { background: #0b0f1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; }
+    form { background: #111; padding: 2rem; border-radius: 12px; box-shadow: 0 0 20px #000; }
+    input { display: block; margin: 1rem 0; padding: 0.6rem; width: 100%; border-radius: 8px; border: none; }
+    button { padding: 0.6rem; width: 100%; background: #26a69a; color: white; font-weight: bold; border: none; border-radius: 8px; }
+    .error { color: red; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <form id="login-form">
+    <h2>Login to AAMPAV</h2>
+    <input type="password" id="password" placeholder="Salvete! dominus meus" required />
+    <button type="submit">Login</button>
+    <div class="error" id="error-msg"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('login-form');
+    const error = document.getElementById('error-msg');
+    const correctPassword = 'Nez!66skp'; // 🔐 CHANGE THIS!
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const entered = document.getElementById('password').value;
+      if (entered === correctPassword) {
+        sessionStorage.setItem('aampav_authed', 'true');
+        window.location.href = 'index.html';
+      } else {
+        error.textContent = 'Wrong password.';
+      }
+    });
+  </script>
+</body>
+</html>

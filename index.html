@@ -1,0 +1,86 @@
+<script>
+  if (sessionStorage.getItem('aampav_authed') !== 'true') {
+    window.location.href = 'login.html';
+  }
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AAMPAV Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1>AAMPAV</h1>
+      <div id="mode-switch" class="mode-switch">
+  Mode: <span id="current-mode">...</span>
+  <button onclick="toggleMode()">Switch Mode</button>
+</div>
+      <div id="bot-status" class="status">Status: ...</div>
+      <div class="controls">
+        <button onclick="deposit()">Deposit</button>
+        <button onclick="startBot()">Start Bot</button>
+        <button onclick="stopBot()">Stop Bot</button>
+        <button onclick="collect()">Collect</button>
+      </div>
+      <div class="logs">
+        <h2>Logs</h2>
+        <pre id="logs">Loading logs...</pre>
+      </div>
+    </aside>
+
+    <!-- Main dashboard -->
+    <main class="dashboard">
+      <section class="chart">
+        <h2>Candlestick Chart</h2>
+      <div id="candlestick-bar" style="font-size: 24px; padding: 10px;"></div>
+      </section>
+
+      <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+      
+      <section class="profit">
+        <h2>Daily Profit</h2>
+        <div id="daily-profit">$0.00</div>
+      </section>
+
+      <section class="signals">
+        <h2>Profit Signals</h2>
+        <ul id="signals">
+          <li>Loading...</li>
+        </ul>
+      </section>
+
+      <section class="market">
+        <h2>Market Overview</h2>
+        <table id="market-table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Price</th>
+              <th>Change</th>
+              <th>Volume</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="brokers">
+        <h2>Connected Brokers</h2>
+        <ul id="brokers">
+          <li>Loading...</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
