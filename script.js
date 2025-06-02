@@ -126,11 +126,11 @@ function stopBot() {
 }
 
 function deposit() {
-  alert('Deposit functionality not implemented.');
+  window.location.href = 'deposit.html'; // ✅ open actual page
 }
 
 function collect() {
-  alert('Collect payments functionality not implemented.');
+  window.location.href = 'collect.html'; // ✅ open actual page
 }
 
 // 📊 Real candlestick symbol rendering
