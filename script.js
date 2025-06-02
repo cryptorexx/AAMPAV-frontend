@@ -133,6 +133,17 @@ function collect() {
   window.location.href = 'collect.html'; // ✅ open actual page
 }
 
+function updateWallet() {
+  fetch(`${BASE}/wallet`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('wallet-address').textContent = data.address || 'Unavailable';
+    })
+    .catch(() => {
+      document.getElementById('wallet-address').textContent = 'Error';
+    });
+}
+
 // 📊 Real candlestick symbol rendering
 function getCandleEmoji(candle) {
   if (candle.close > candle.open) return '📈';
@@ -193,6 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
   updateMarket();
   updateProfit();
   fetchCandlesticks();
+  updateWallet();
 
   setInterval(() => {
     updateStatus();
