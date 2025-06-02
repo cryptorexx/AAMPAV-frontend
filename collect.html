@@ -31,7 +31,21 @@
     }
 
     // Optional: display mock split balance
-    document.getElementById('profit').textContent = '$428.77 available to collect';
+    async function loadProfit() {
+  try {
+    const res = await fetch('https://aampav-backend.onrender.com/profit', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    document.getElementById('profit').textContent = `$${data.amount} available to collect`;
+  } catch (e) {
+    document.getElementById('profit').textContent = 'Failed to load balance';
+  }
+}
+
+loadProfit(); // Call on page load
+
   </script>
 </body>
 </html>
