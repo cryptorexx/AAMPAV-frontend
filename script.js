@@ -162,12 +162,12 @@ function updateModeDisplay() {
     .then(res => res.json())
     .then(data => {
       const btn = document.getElementById('mode-switch');
-      if (!btn) return;
+      const label = document.getElementById('mode-label');
       if (data.mode === 'DEMO') {
-        btn.textContent = 'DEMO';
+        label.textContent = 'DEMO';
         btn.style.background = 'grey';
       } else {
-        btn.textContent = 'REAL';
+        label.textContent = 'REAL';
         btn.style.background = 'dodgerblue';
       }
     });
