@@ -28,12 +28,13 @@
   </button>
 </div>
       <div id="bot-status" class="status">Status: ...</div>
-      <div class="controls">
-        <button onclick="deposit()">Deposit</button>
-        <button onclick="startBot()">Start Bot</button>
-        <button onclick="stopBot()">Stop Bot</button>
-        <button onclick="collect()">Collect</button>
-      </div>
+<div class="controls">
+  <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
+  <button id="depositBtn">Deposit</button>
+  <button id="startBot">Start Bot</button>
+  <button id="stopBot">Stop Bot</button>
+  <button id="collectBtn">Collect</button>
+</div>
       <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
   Wallet: <span id="wallet-address">Loading...</span>
 </div>
