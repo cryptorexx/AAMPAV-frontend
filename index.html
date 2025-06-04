@@ -17,27 +17,34 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <h1>AAMPAV</h1>
-      <div id="mode-switch" class="mode-switch">
-  Mode: <span id="current-mode">...</span>
-  <button onclick="toggleMode()">Switch Mode</button>
-</div>
+
+      <div class="mode-switch">
+        Mode: <span id="current-mode">...</span>
+        <!-- Removed duplicate ID -->
+        <button id="toggleModeBtn" onclick="toggleMode()">Switch Mode</button>
+      </div>
+
       <div style="margin: 1rem 0;">
-  <h3>Mode: <span id="mode-label">...</span></h3>
-  <button id="mode-switch" onclick="toggleMode()" style="padding: 0.5rem 1rem; font-weight: bold; border-radius: 10px; border: none; color: white;">
-    Switch Mode
-  </button>
-</div>
+        <h3>Mode: <span id="mode-label">...</span></h3>
+        <button id="mode-switch" onclick="toggleMode()" style="padding: 0.5rem 1rem; font-weight: bold; border-radius: 10px; border: none; color: white;">
+          Switch Mode
+        </button>
+      </div>
+
       <div id="bot-status" class="status">Status: ...</div>
-<div class="controls">
-  <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
-  <button id="depositBtn">Deposit</button>
-  <button id="startBot">Start Bot</button>
-  <button id="stopBot">Stop Bot</button>
-  <button id="collectBtn">Collect</button>
-</div>
+
+      <div class="controls">
+        <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
+        <button id="depositBtn">Deposit</button>
+        <button id="startBot">Start Bot</button>
+        <button id="stopBot">Stop Bot</button>
+        <button id="collectBtn">Collect</button>
+      </div>
+
       <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
-  Wallet: <span id="wallet-address">Loading...</span>
-</div>
+        Wallet: <span id="wallet-address">Loading...</span>
+      </div>
+
       <div class="logs">
         <h2>Logs</h2>
         <pre id="logs">Loading logs...</pre>
@@ -48,7 +55,9 @@
     <main class="dashboard">
       <section class="chart">
         <h2>Candlestick Chart</h2>
-      <div id="candlestick-bar" style="font-size: 24px; padding: 10px;"></div>
+        <!-- ✅ ADD chart element that script.js depends on -->
+        <div id="chart" style="height: 200px;"></div>
+        <div id="candlestick-bar" style="font-size: 24px; padding: 10px;"></div>
       </section>
 
       <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
