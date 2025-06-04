@@ -19,8 +19,12 @@
   </main>
 
   <script>
+    let amount = 0;
+
     async function collectNow() {
-      const res = await fetch('https://aampav-backend.onrender.com/pay?amount=999', {
+      if (!amount || amount <= 0) return alert("No profit to collect");
+
+      const res = await fetch(`https://aampav-backend.onrender.com/pay?amount=${amount}`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -30,22 +34,21 @@
         : (data.error || '❌ Collection failed');
     }
 
-    // Optional: display mock split balance
     async function loadProfit() {
-  try {
-    const res = await fetch('https://aampav-backend.onrender.com/profit', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    const data = await res.json();
-    document.getElementById('profit').textContent = `$${data.amount} available to collect`;
-  } catch (e) {
-    document.getElementById('profit').textContent = 'Failed to load balance';
-  }
-}
+      try {
+        const res = await fetch('https://aampav-backend.onrender.com/profit', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        amount = data.amount;
+        document.getElementById('profit').textContent = `$${amount} available to collect`;
+      } catch (e) {
+        document.getElementById('profit').textContent = 'Failed to load balance';
+      }
+    }
 
-loadProfit(); // Call on page load
-
+    loadProfit(); // Call on page load
   </script>
 </body>
 </html>
