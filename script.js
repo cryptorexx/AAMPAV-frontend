@@ -1,4 +1,17 @@
 const BASE = 'https://aampav-backend.onrender.com';
+const API_KEY = 'your_default_key'; // Must match your backend env value
+
+function authorizedFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': API_KEY,
+      ...(options.headers || {})
+    }
+  });
+}
 
 function initChart() {
   const chartEl = document.getElementById('chart');
@@ -38,7 +51,7 @@ function initChart() {
 }
 
 function updateStatus() {
-  fetch(`${BASE}/status`, { credentials: 'include' })
+  authorizedFetch(`${BASE}/status`, { method: 'GET' })
     .then(res => res.json())
     .then(data => {
       document.getElementById('bot-status').textContent = `Status: ${data.status || 'Unknown'}`;
@@ -49,7 +62,7 @@ function updateStatus() {
 }
 
 function updateLogs() {
-  fetch(`${BASE}/logs`, { credentials: 'include' })
+  authorizedFetch(`${BASE}/logs`, { method: 'GET' })
     .then(res => res.json())
     .then(data => {
       document.getElementById('logs').textContent = (data.logs || []).join('\n');
@@ -111,30 +124,37 @@ function updateMarket() {
 }
 
 function updateProfit() {
-  document.getElementById('daily-profit').textContent = '$172.34';
+  authorizedFetch(`${BASE}/profit`, { method: 'GET' })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('daily-profit').textContent = `$${data.amount}`;
+    })
+    .catch(() => {
+      document.getElementById('daily-profit').textContent = '$0.00';
+    });
 }
 
 // Button actions
 function startBot() {
-  fetch(`${BASE}/start-bot`, { method: 'POST', credentials: 'include' })
+  authorizedFetch(`${BASE}/start-bot`, { method: 'POST' })
     .then(updateStatus);
 }
 
 function stopBot() {
-  fetch(`${BASE}/stop-bot`, { method: 'POST', credentials: 'include' })
+  authorizedFetch(`${BASE}/stop-bot`, { method: 'POST' })
     .then(updateStatus);
 }
 
 function deposit() {
-  window.location.href = 'deposit.html'; // ✅ open actual page
+  window.location.href = 'deposit.html';
 }
 
 function collect() {
-  window.location.href = 'collect.html'; // ✅ open actual page
+  window.location.href = 'collect.html';
 }
 
 function updateWallet() {
-  fetch(`${BASE}/wallet`, { credentials: 'include' })
+  authorizedFetch(`${BASE}/wallet`, { method: 'GET' })
     .then(res => res.json())
     .then(data => {
       document.getElementById('wallet-address').textContent = data.address || 'Unavailable';
@@ -185,7 +205,7 @@ function updateModeDisplay() {
 }
 
 function toggleMode() {
-  const current = document.getElementById('mode-switch').textContent;
+  const current = document.getElementById('mode-label').textContent;
   const newMode = current === 'DEMO' ? 'live' : 'demo';
   fetch(`${BASE}/mode?mode=${newMode}`, {
     method: 'POST',
