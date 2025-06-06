@@ -89,6 +89,28 @@ function updateBrokers() {
     });
 }
 
+function connectAnalysisWebSocket() {
+  const output = document.getElementById('ai-output');
+  const socket = new WebSocket("wss://aampav-backend.onrender.com/ws/analyze");
+
+  socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    output.textContent = JSON.stringify(data.analysis, null, 2);
+  };
+
+  socket.onopen = function () {
+    output.textContent = "✅ Connected to Analysis AI...";
+  };
+
+  socket.onerror = function () {
+    output.textContent = "❌ WebSocket error while connecting.";
+  };
+
+  socket.onclose = function () {
+    output.textContent += "\n⚠️ Connection closed.";
+  };
+}
+        
 function updateSignals() {
   const signals = [
     'BTC/USD +2.1%',
