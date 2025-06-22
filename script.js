@@ -1,5 +1,5 @@
 const BASE = 'https://aampav-backend.onrender.com';
-const API_KEY = 'your_default_key'; // Must match your backend env value
+const API_KEY = 'gAAAAABmYfH2i2pm_YzTGR2x2D-nJjFYKABnp2oyd4v1-jh1aZB9wQkfzUxnzT-JVwnFS1qPEsCGBRO0xnPrpwQ_zEZ8tAdhHg=='; // Must match your backend env value
 
 function authorizedFetch(url, options = {}) {
   return fetch(url, {
