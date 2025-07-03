@@ -1,6 +1,33 @@
 const BASE = 'https://aampav-backend.onrender.com';
 const API_KEY = 'gAAAAABmYfH2i2pm_YzTGR2x2D-nJjFYKABnp2oyd4v1-jh1aZB9wQkfzUxnzT-JVwnFS1qPEsCGBRO0xnPrpwQ_zEZ8tAdhHg=='; // Must match your backend env value
 
+function loadMacroDashboard() {
+  fetch(`${BASE}/api/candlesticks`, {
+    headers: { 'X-API-Key': API_KEY }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("macro-dashboard");
+    container.innerHTML = "";
+
+    data.forEach(candle => {
+      const card = document.createElement("div");
+      card.style = "background:#222;border:1px solid #444;border-radius:8px;padding:10px;min-width:100px;text-align:center;color:white;";
+      const diff = candle.close - candle.open;
+      const color = diff > 0 ? "#00ff99" : diff < 0 ? "#ff5566" : "#cccccc";
+
+      card.innerHTML = `
+        <strong>${candle.symbol}</strong><br/>
+        <span style="color:${color}">Open: ${candle.open}<br/>Close: ${candle.close}</span>
+      `;
+      container.appendChild(card);
+    });
+  })
+  .catch(err => {
+    console.error("Failed to load macro dashboard", err);
+  });
+}
+
 function authorizedFetch(url, options = {}) {
   return fetch(url, {
     ...options,
@@ -214,6 +241,7 @@ function toggleMode() {
 }
 
 // Init
+window.addEventListener("load", loadMacroDashboard);
 window.addEventListener('DOMContentLoaded', () => {
   initChart();
   updateModeDisplay();
