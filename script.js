@@ -1,60 +1,5 @@
 const BASE = 'https://aampav-backend.onrender.com';
-const API_KEY = 'gAAAAABmYfH2i2pm_YzTGR2x2D-nJjFYKABnp2oyd4v1-jh1aZB9wQkfzUxnzT-JVwnFS1qPEsCGBRO0xnPrpwQ_zEZ8tAdhHg=='; // Must match your backend env value
-
-let logInterval = null;
-
-function startBot() {
-  fetch(`${BASE}/start-bot`, { method: "POST", headers: { 'X-API-Key': API_KEY } })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("log-panel").innerHTML = "Bot started...<br/>";
-      if (logInterval) clearInterval(logInterval);
-      logInterval = setInterval(fetchLogs, 2000);
-    });
-}
-
-function stopBot() {
-  fetch(`${BASE}/stop-bot`, { method: "POST", headers: { 'X-API-Key': API_KEY } })
-    .then(() => {
-      clearInterval(logInterval);
-      document.getElementById("log-panel").innerHTML += "<br/>Bot stopped.";
-    });
-}
-
-function fetchLogs() {
-  fetch(`${BASE}/logs`, { headers: { 'X-API-Key': API_KEY } })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("log-panel").innerHTML = data.logs.map(l => l).join("<br/>");
-    });
-}
-
-function loadMacroDashboard() {
-  fetch(`${BASE}/api/candlesticks`, {
-    headers: { 'X-API-Key': API_KEY }
-  })
-  .then(res => res.json())
-  .then(data => {
-    const container = document.getElementById("macro-dashboard");
-    container.innerHTML = "";
-
-    data.forEach(candle => {
-      const card = document.createElement("div");
-      card.style = "background:#222;border:1px solid #444;border-radius:8px;padding:10px;min-width:100px;text-align:center;color:white;";
-      const diff = candle.close - candle.open;
-      const color = diff > 0 ? "#00ff99" : diff < 0 ? "#ff5566" : "#cccccc";
-
-      card.innerHTML = `
-        <strong>${candle.symbol}</strong><br/>
-        <span style="color:${color}">Open: ${candle.open}<br/>Close: ${candle.close}</span>
-      `;
-      container.appendChild(card);
-    });
-  })
-  .catch(err => {
-    console.error("Failed to load macro dashboard", err);
-  });
-}
+const API_KEY = 'gAAAAABmYfH2i2pm_YzTGR2x2D-nJjFYKABnp2oyd4v1-jh1aZB9wQkfzUxnzT-JVwnFS1qPEsCGBRO0xnPrpwQ_zEZ8tAdhHg==';
 
 function authorizedFetch(url, options = {}) {
   return fetch(url, {
@@ -68,45 +13,22 @@ function authorizedFetch(url, options = {}) {
   });
 }
 
-function initChart() {
-  const chartEl = document.getElementById('chart');
-  const chart = LightweightCharts.createChart(chartEl, {
-    width: chartEl.clientWidth,
-    height: 200,
-    layout: {
-      background: { color: '#222' },
-      textColor: '#DDD',
-    },
-    grid: {
-      vertLines: { color: '#333' },
-      horzLines: { color: '#333' },
-    },
-    timeScale: {
-      timeVisible: true,
-      secondsVisible: false,
-    },
-  });
-
-  const candleSeries = chart.addCandlestickSeries({
-    upColor: '#26a69a',
-    downColor: '#ef5350',
-    borderVisible: false,
-    wickUpColor: '#26a69a',
-    wickDownColor: '#ef5350',
-  });
-
-  fetch(`${BASE}/candles`, { credentials: 'include' })
-    .then(res => res.json())
-    .then(candles => {
-      candleSeries.setData(candles);
-    })
-    .catch(err => {
-      console.error('Chart fetch failed:', err);
-    });
+// Bot Controls
+function startBot() {
+  authorizedFetch(`${BASE}/start-bot`, { method: 'POST' })
+    .then(updateStatus)
+    .then(updateLogs);
 }
 
+function stopBot() {
+  authorizedFetch(`${BASE}/stop-bot`, { method: 'POST' })
+    .then(updateStatus)
+    .then(updateLogs);
+}
+
+// Status & Logs
 function updateStatus() {
-  authorizedFetch(`${BASE}/status`, { method: 'GET' })
+  authorizedFetch(`${BASE}/status`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('bot-status').textContent = `Status: ${data.status || 'Unknown'}`;
@@ -117,7 +39,7 @@ function updateStatus() {
 }
 
 function updateLogs() {
-  authorizedFetch(`${BASE}/logs`, { method: 'GET' })
+  authorizedFetch(`${BASE}/logs`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('logs').textContent = (data.logs || []).join('\n');
@@ -127,6 +49,7 @@ function updateLogs() {
     });
 }
 
+// Brokers & Signals
 function updateBrokers() {
   fetch(`${BASE}/brokers`, { credentials: 'include' })
     .then(res => res.json())
@@ -178,8 +101,9 @@ function updateMarket() {
   });
 }
 
+// Profit + Wallet
 function updateProfit() {
-  authorizedFetch(`${BASE}/profit`, { method: 'GET' })
+  authorizedFetch(`${BASE}/profit`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('daily-profit').textContent = `$${data.amount}`;
@@ -189,27 +113,8 @@ function updateProfit() {
     });
 }
 
-// Button actions
-function startBot() {
-  authorizedFetch(`${BASE}/start-bot`, { method: 'POST' })
-    .then(updateStatus);
-}
-
-function stopBot() {
-  authorizedFetch(`${BASE}/stop-bot`, { method: 'POST' })
-    .then(updateStatus);
-}
-
-function deposit() {
-  window.location.href = 'deposit.html';
-}
-
-function collect() {
-  window.location.href = 'collect.html';
-}
-
 function updateWallet() {
-  authorizedFetch(`${BASE}/wallet`, { method: 'GET' })
+  authorizedFetch(`${BASE}/wallet`)
     .then(res => res.json())
     .then(data => {
       document.getElementById('wallet-address').textContent = data.address || 'Unavailable';
@@ -219,18 +124,17 @@ function updateWallet() {
     });
 }
 
-// 📊 Real candlestick symbol rendering
-function getCandleEmoji(candle) {
-  if (candle.close > candle.open) return '📈';
-  if (candle.close < candle.open) return '📉';
+// Candlestick Ticker Bar
+function getCandleEmoji(c) {
+  if (c.close > c.open) return '📈';
+  if (c.close < c.open) return '📉';
   return '➖';
 }
 
 function renderCandlestickBar(candles) {
   const bar = document.getElementById('candlestick-bar');
-  if (!bar || !candles || candles.length === 0) return;
-  const symbols = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
-  bar.textContent = symbols;
+  if (!bar || !candles || !candles.length) return;
+  bar.textContent = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
 }
 
 async function fetchCandlesticks() {
@@ -239,16 +143,46 @@ async function fetchCandlesticks() {
     const data = await res.json();
     renderCandlestickBar(data);
   } catch (err) {
-    console.error("Failed to fetch candlesticks", err);
+    console.error("Candlestick fetch failed", err);
   }
 }
 
+// Chart Initialization
+function initChart() {
+  const chartEl = document.getElementById('chart');
+  const chart = LightweightCharts.createChart(chartEl, {
+    width: chartEl.clientWidth,
+    height: 200,
+    layout: { background: { color: '#222' }, textColor: '#DDD' },
+    grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
+    timeScale: { timeVisible: true, secondsVisible: false },
+  });
+
+  const series = chart.addCandlestickSeries({
+    upColor: '#00ff99',
+    downColor: '#ff5566',
+    wickUpColor: '#00ff99',
+    wickDownColor: '#ff5566',
+    borderVisible: false,
+  });
+
+  fetch(`${BASE}/candles`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      series.setData(data);
+    })
+    .catch(err => {
+      console.error('Chart fetch error:', err);
+    });
+}
+
+// Demo / Real Mode
 function updateModeDisplay() {
   fetch(`${BASE}/mode`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
-      const btn = document.getElementById('mode-switch');
       const label = document.getElementById('mode-label');
+      const btn = document.getElementById('mode-switch');
       if (data.mode === 'DEMO') {
         label.textContent = 'DEMO';
         btn.style.background = 'grey';
@@ -268,8 +202,30 @@ function toggleMode() {
   }).then(updateModeDisplay);
 }
 
+// AI WebSocket Output
+function connectAnalysisWebSocket() {
+  const output = document.getElementById('ai-output');
+  const socket = new WebSocket("wss://aampav-backend.onrender.com/ws/analyze");
+
+  socket.onopen = () => {
+    output.textContent = "✅ Connected to Analysis AI...";
+  };
+
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    output.textContent = JSON.stringify(data.analysis, null, 2);
+  };
+
+  socket.onerror = () => {
+    output.textContent = "❌ WebSocket error.";
+  };
+
+  socket.onclose = () => {
+    output.textContent += "\n⚠️ Connection closed.";
+  };
+}
+
 // Init
-window.addEventListener("load", loadMacroDashboard);
 window.addEventListener('DOMContentLoaded', () => {
   initChart();
   updateModeDisplay();
@@ -279,8 +235,8 @@ window.addEventListener('DOMContentLoaded', () => {
   updateSignals();
   updateMarket();
   updateProfit();
-  fetchCandlesticks();
   updateWallet();
+  fetchCandlesticks();
   connectAnalysisWebSocket();
 
   setInterval(() => {
@@ -295,25 +251,11 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(fetchCandlesticks, 5000);
 });
 
-function connectAnalysisWebSocket() {
-  const output = document.getElementById('ai-output');
-  const socket = new WebSocket("wss://aampav-backend.onrender.com/ws/analyze");
-
-  socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    output.textContent = JSON.stringify(data.analysis, null, 2);
-  };
-
-  socket.onopen = function () {
-    output.textContent = "✅ Connected to Analysis AI...";
-  };
-
-  socket.onerror = function () {
-    output.textContent = "❌ WebSocket error while connecting.";
-  };
-
-  socket.onclose = function () {
-    output.textContent += "\n⚠️ Connection closed.";
-  };
+// Payments
+function deposit() {
+  window.location.href = 'deposit.html';
 }
-        
+
+function collect() {
+  window.location.href = 'collect.html';
+}
