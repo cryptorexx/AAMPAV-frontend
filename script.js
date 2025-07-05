@@ -1,6 +1,34 @@
 const BASE = 'https://aampav-backend.onrender.com';
 const API_KEY = 'gAAAAABmYfH2i2pm_YzTGR2x2D-nJjFYKABnp2oyd4v1-jh1aZB9wQkfzUxnzT-JVwnFS1qPEsCGBRO0xnPrpwQ_zEZ8tAdhHg=='; // Must match your backend env value
 
+let logInterval = null;
+
+function startBot() {
+  fetch(`${BASE}/start-bot`, { method: "POST", headers: { 'X-API-Key': API_KEY } })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("log-panel").innerHTML = "Bot started...<br/>";
+      if (logInterval) clearInterval(logInterval);
+      logInterval = setInterval(fetchLogs, 2000);
+    });
+}
+
+function stopBot() {
+  fetch(`${BASE}/stop-bot`, { method: "POST", headers: { 'X-API-Key': API_KEY } })
+    .then(() => {
+      clearInterval(logInterval);
+      document.getElementById("log-panel").innerHTML += "<br/>Bot stopped.";
+    });
+}
+
+function fetchLogs() {
+  fetch(`${BASE}/logs`, { headers: { 'X-API-Key': API_KEY } })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("log-panel").innerHTML = data.logs.map(l => l).join("<br/>");
+    });
+}
+
 function loadMacroDashboard() {
   fetch(`${BASE}/api/candlesticks`, {
     headers: { 'X-API-Key': API_KEY }
