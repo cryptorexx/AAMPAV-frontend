@@ -181,25 +181,35 @@ function updateModeDisplay() {
   fetch(`${BASE}/mode`, { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
-      const label = document.getElementById('mode-label');
-      const btn = document.getElementById('mode-switch');
+      const modeLabel = document.getElementById('current-mode');
+      const toggleBtn = document.getElementById('toggle-mode-btn');
+
       if (data.mode === 'DEMO') {
-        label.textContent = 'DEMO';
-        btn.style.background = 'grey';
+        modeLabel.textContent = 'DEMO';
+        toggleBtn.textContent = 'Switch to REAL';
+        toggleBtn.style.background = 'grey';
       } else {
-        label.textContent = 'REAL';
-        btn.style.background = 'dodgerblue';
+        modeLabel.textContent = 'LIVE';
+        toggleBtn.textContent = 'Switch to DEMO';
+        toggleBtn.style.background = 'dodgerblue';
       }
     });
 }
 
 function toggleMode() {
-  const current = document.getElementById('mode-label').textContent;
-  const newMode = current === 'DEMO' ? 'live' : 'demo';
+  const currentMode = document.getElementById('current-mode').textContent.toLowerCase();
+  const newMode = currentMode === 'demo' ? 'live' : 'demo';
+
   fetch(`${BASE}/mode?mode=${newMode}`, {
     method: 'POST',
     credentials: 'include'
-  }).then(updateModeDisplay);
+  })
+  .then(res => res.json())
+  .then(updateModeDisplay)
+  .catch(err => {
+    console.error('Failed to toggle mode:', err);
+    // Add a user-facing error message here if needed
+  });
 }
 
 // AI WebSocket Output
@@ -229,6 +239,7 @@ function connectAnalysisWebSocket() {
 window.addEventListener('DOMContentLoaded', () => {
   initChart();
   updateModeDisplay();
+  document.getElementById('toggle-mode-btn').addEventListener('click', toggleMode);
   updateStatus();
   updateLogs();
   updateBrokers();
