@@ -1,107 +1,91 @@
-<script>
-  if (sessionStorage.getItem('aampav_authed') !== 'true') {
-    window.location.href = 'login.html';
-  }
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AAMPAV Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAMPAV Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
-  <div class="layout">
-    <!-- Sidebar -->
-<aside class="sidebar">
-    <h1>AAMPAV</h1>
+    <div id="app">
+        <div id="candlestick-bar" class="ticker-bar">
+            Loading market data...
+        </div>
 
-    <div style="margin: 1rem 0;">
-        <h3>Mode: <span id="current-mode" style="font-weight: normal;">...</span></h3>
-        <button id="toggle-mode-btn" style="padding: 0.5rem 1rem; font-weight: bold; border-radius: 10px; border: none; color: white;"></button>
+        <main class="main-content">
+            <div class="header-container">
+                <div class="balance-container">
+                    <h1>Balance: <span id="balance">$0.00</span></h1>
+                    <p>Daily Profit: <span id="daily-profit">$0.00</span></p>
+                </div>
+                <div class="broker-container">
+                    <p>Brokers connected: <span id="brokers-count">0</span></p>
+                    <ul id="brokers"></ul>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div id="chart" style="width: 100%; height: 400px;"></div>
+            </div>
+
+            <div class="content-row">
+                <div class="content-box">
+                    <h2>AI Output</h2>
+                    <pre id="ai-output">Waiting for analysis...</pre>
+                </div>
+
+                <div class="content-box">
+                    <h2>Signals</h2>
+                    <ul id="signals"></ul>
+                </div>
+            </div>
+
+            <div class="content-box market-data">
+                <h2>Market Data</h2>
+                <table id="market-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <h1>AAMPAV</h1>
+
+            <div style="margin: 1rem 0;">
+                <h3>Mode: <span id="current-mode" style="font-weight: normal;">...</span></h3>
+                <button id="toggle-mode-btn" style="padding: 0.5rem 1rem; font-weight: bold; border-radius: 10px; border: none; color: white;"></button>
+            </div>
+
+            <div id="bot-status" class="status">Status: ...</div>
+
+            <div class="controls">
+                <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
+                <button id="depositBtn">Deposit</button>
+                <button id="startBot">Start Bot</button>
+                <button id="stopBot">Stop Bot</button>
+                <button id="collectBtn">Collect</button>
+            </div>
+
+            <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
+                Wallet: <span id="wallet-address">Loading...</span>
+            </div>
+
+            <div class="logs">
+                <h2>Logs</h2>
+                <pre id="logs">Loading logs...</pre>
+            </div>
+        </aside>
     </div>
-
-    <div id="bot-status" class="status">Status: ...</div>
-
-    <div class="controls">
-        <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
-        <button id="depositBtn">Deposit</button>
-        <button id="startBot">Start Bot</button>
-        <button id="stopBot">Stop Bot</button>
-        <button id="collectBtn">Collect</button>
-    </div>
-
-    <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
-        Wallet: <span id="wallet-address">Loading...</span>
-    </div>
-
-    <div class="logs">
-        <h2>Logs</h2>
-        <pre id="logs">Loading logs...</pre>
-    </div>
-</aside>
-
-    <!-- Main dashboard -->
-    <main class="dashboard">
-      <section class="chart">
-        <h2>Candlestick Chart</h2>
-        <!-- ✅ ADD chart element that script.js depends on -->
-        <div id="chart" style="height: 200px;"></div>
-        <div id="macro-dashboard" style="display: flex; flex-wrap: wrap; gap: 12px; padding: 10px;">
-  <!-- Candlestick cards will be inserted here -->
-</div>
-        <div id="candlestick-bar" style="font-size: 24px; padding: 10px;"></div>
-      </section>
-
-      <section class="ai-analysis">
-  <h2>Live AI Market Analysis</h2>
-  <pre id="ai-output" style="font-size: 0.9rem; background: #111; color: #0f0; padding: 1rem; border-radius: 10px;">
-Connecting to AI...
-  </pre>
-</section>
-
-      <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-      
-      <section class="profit">
-        <h2>Daily Profit</h2>
-        <div id="daily-profit">$0.00</div>
-      </section>
-
-      <section class="signals">
-        <h2>Profit Signals</h2>
-        <ul id="signals">
-          <li>Loading...</li>
-        </ul>
-      </section>
-
-      <section class="market">
-        <h2>Market Overview</h2>
-        <table id="market-table">
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Price</th>
-              <th>Change</th>
-              <th>Volume</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="4">Loading...</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="brokers">
-        <h2>Connected Brokers</h2>
-        <ul id="brokers">
-          <li>Loading...</li>
-        </ul>
-      </section>
-    </main>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
