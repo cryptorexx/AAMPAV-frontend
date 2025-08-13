@@ -234,13 +234,26 @@ function connectAnalysisWebSocket() {
     };
 }
 
+// Payments
+function deposit() {
+    window.location.href = 'deposit.html';
+}
+
+function collect() {
+    window.location.href = 'collect.html';
+}
+
 // Init
 window.addEventListener('DOMContentLoaded', () => {
     initChart();
     updateModeDisplay(); // Sets the initial mode and button text
-    document.getElementById('toggle-mode-btn').addEventListener('click', toggleMode); // Attach listener to the correct button
+
+    // Attach event listeners to all buttons
+    document.getElementById('toggle-mode-btn').addEventListener('click', toggleMode);
     document.getElementById('startBot').addEventListener('click', startBot);
     document.getElementById('stopBot').addEventListener('click', stopBot);
+    document.getElementById('depositBtn').addEventListener('click', deposit);
+    document.getElementById('collectBtn').addEventListener('click', collect);
 
     updateStatus();
     updateLogs();
@@ -263,12 +276,3 @@ window.addEventListener('DOMContentLoaded', () => {
 
     setInterval(fetchCandlesticks, 5000);
 });
-
-// Payments
-function deposit() {
-    window.location.href = 'deposit.html';
-}
-
-function collect() {
-    window.location.href = 'collect.html';
-}
