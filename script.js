@@ -13,118 +13,114 @@ function authorizedFetch(url, options = {}) {
     });
 }
 
-// Bot Controls
+// --- Bot Controls ---
 function startBot() {
     authorizedFetch(`${BASE}/start-bot`, { method: 'POST' })
         .then(updateStatus)
-        .then(updateLogs);
+        .then(updateLogs)
+        .catch(err => console.error("Start bot failed:", err));
 }
 
 function stopBot() {
     authorizedFetch(`${BASE}/stop-bot`, { method: 'POST' })
         .then(updateStatus)
-        .then(updateLogs);
+        .then(updateLogs)
+        .catch(err => console.error("Stop bot failed:", err));
 }
 
-// Status & Logs
+// --- Status & Logs ---
 function updateStatus() {
-    authorizedFetch(`${BASE}/status`)
+    return authorizedFetch(`${BASE}/status`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById('bot-status').textContent = `Status: ${data.status || 'Unknown'}`;
-        })
-        .catch(() => {
-            document.getElementById('bot-status').textContent = 'Status: Error';
+            const el = document.getElementById('bot-status');
+            if (el) el.textContent = `Status: ${data.status || 'Unknown'}`;
         });
 }
 
 function updateLogs() {
-    authorizedFetch(`${BASE}/logs`)
+    return authorizedFetch(`${BASE}/logs`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById('logs').textContent = (data.logs || []).join('\n');
-        })
-        .catch(() => {
-            document.getElementById('logs').textContent = 'Error loading logs';
+            const el = document.getElementById('logs');
+            if (el) el.textContent = (data.logs || []).join('\n');
         });
 }
 
-// Brokers & Signals
+// --- Brokers ---
 function updateBrokers() {
-    fetch(`${BASE}/brokers`, { credentials: 'include' })
+    return authorizedFetch(`${BASE}/brokers`)
         .then(res => res.json())
         .then(data => {
             const ul = document.getElementById('brokers');
+            if (!ul) return;
             ul.innerHTML = '';
             (data.brokers || []).forEach(b => {
                 const li = document.createElement('li');
                 li.textContent = b;
                 ul.appendChild(li);
             });
-        })
-        .catch(() => {
-            document.getElementById('brokers').innerHTML = '<li>Error loading brokers</li>';
         });
 }
 
+// --- Signals (now from backend instead of dummy data) ---
 function updateSignals() {
-    const signals = [
-        'BTC/USD +2.1%',
-        'ETH/USD +1.4%',
-        'XRP/USD +0.7%',
-    ];
-    const list = document.getElementById('signals');
-    list.innerHTML = '';
-    signals.forEach(sig => {
-        const li = document.createElement('li');
-        li.textContent = sig;
-        list.appendChild(li);
-    });
-}
-
-function updateMarket() {
-    const market = [
-        ['BTC/USD', '$62,000', '+2.1%', '$20B'],
-        ['ETH/USD', '$3,100', '+1.4%', '$12B'],
-        ['SOL/USD', '$145', '+0.9%', '$3B'],
-    ];
-    const tbody = document.querySelector('#market-table tbody');
-    tbody.innerHTML = '';
-    market.forEach(row => {
-        const tr = document.createElement('tr');
-        row.forEach(cell => {
-            const td = document.createElement('td');
-            td.textContent = cell;
-            tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-    });
-}
-
-// Profit + Wallet
-function updateProfit() {
-    authorizedFetch(`${BASE}/profit`)
+    return authorizedFetch(`${BASE}/signals`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById('daily-profit').textContent = `$${data.amount}`;
+            const list = document.getElementById('signals');
+            if (!list) return;
+            list.innerHTML = '';
+            (data.signals || []).forEach(sig => {
+                const li = document.createElement('li');
+                li.textContent = sig;
+                list.appendChild(li);
+            });
         })
-        .catch(() => {
-            document.getElementById('daily-profit').textContent = '$0.00';
+        .catch(err => console.error("Signals fetch failed:", err));
+}
+
+// --- Market Data (backend driven) ---
+function updateMarket() {
+    return authorizedFetch(`${BASE}/market`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.querySelector('#market-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            (data.market || []).forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => console.error("Market fetch failed:", err));
+}
+
+// --- Profit + Wallet ---
+function updateProfit() {
+    return authorizedFetch(`${BASE}/profit`)
+        .then(res => res.json())
+        .then(data => {
+            const el = document.getElementById('daily-profit');
+            if (el) el.textContent = `$${data.amount || 0}`;
         });
 }
 
 function updateWallet() {
-    authorizedFetch(`${BASE}/wallet`)
+    return authorizedFetch(`${BASE}/wallet`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById('wallet-address').textContent = data.address || 'Unavailable';
-        })
-        .catch(() => {
-            document.getElementById('wallet-address').textContent = 'Error';
+            const el = document.getElementById('wallet-address');
+            if (el) el.textContent = data.address || 'Unavailable';
         });
 }
 
-// Candlestick Ticker Bar
+// --- Candlestick Bar ---
 function getCandleEmoji(c) {
     if (c.close > c.open) return '📈';
     if (c.close < c.open) return '📉';
@@ -133,23 +129,22 @@ function getCandleEmoji(c) {
 
 function renderCandlestickBar(candles) {
     const bar = document.getElementById('candlestick-bar');
-    if (!bar || !candles || !candles.length) return;
+    if (!bar) return;
     bar.textContent = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
 }
 
-async function fetchCandlesticks() {
-    try {
-        const res = await fetch(`${BASE}/api/candlesticks`, { credentials: 'include' });
-        const data = await res.json();
-        renderCandlestickBar(data);
-    } catch (err) {
-        console.error("Candlestick fetch failed", err);
-    }
+function fetchCandlesticks() {
+    return authorizedFetch(`${BASE}/candlesticks`)
+        .then(res => res.json())
+        .then(data => renderCandlestickBar(data))
+        .catch(err => console.error("Candlestick fetch failed", err));
 }
 
-// Chart Initialization
+// --- Chart ---
 function initChart() {
     const chartEl = document.getElementById('chart');
+    if (!chartEl) return;
+
     const chart = LightweightCharts.createChart(chartEl, {
         width: chartEl.clientWidth,
         height: 200,
@@ -166,23 +161,20 @@ function initChart() {
         borderVisible: false,
     });
 
-    fetch(`${BASE}/candles`, { credentials: 'include' })
+    authorizedFetch(`${BASE}/candles`)
         .then(res => res.json())
-        .then(data => {
-            series.setData(data);
-        })
-        .catch(err => {
-            console.error('Chart fetch error:', err);
-        });
+        .then(data => series.setData(data))
+        .catch(err => console.error('Chart fetch error:', err));
 }
 
-// Demo / Real Mode
+// --- Mode Switch ---
 function updateModeDisplay() {
-    fetch(`${BASE}/mode`, { credentials: 'include' })
+    return authorizedFetch(`${BASE}/mode`)
         .then(res => res.json())
         .then(data => {
             const modeLabel = document.getElementById('current-mode');
             const toggleBtn = document.getElementById('toggle-mode-btn');
+            if (!modeLabel || !toggleBtn) return;
 
             if (data.mode === 'DEMO') {
                 modeLabel.textContent = 'DEMO';
@@ -200,61 +192,51 @@ function toggleMode() {
     const currentMode = document.getElementById('current-mode').textContent.toLowerCase();
     const newMode = currentMode === 'demo' ? 'live' : 'demo';
 
-    fetch(`${BASE}/mode?mode=${newMode}`, {
-        method: 'POST',
-        credentials: 'include'
-    })
-    .then(res => res.json())
-    .then(updateModeDisplay)
-    .catch(err => {
-        console.error('Failed to toggle mode:', err);
-    });
+    authorizedFetch(`${BASE}/mode?mode=${newMode}`, { method: 'POST' })
+        .then(res => res.json())
+        .then(updateModeDisplay)
+        .catch(err => console.error('Failed to toggle mode:', err));
 }
 
-// AI WebSocket Output
+// --- WebSocket ---
 function connectAnalysisWebSocket() {
     const output = document.getElementById('ai-output');
+    if (!output) return;
     const socket = new WebSocket("wss://aampav-backend.onrender.com/ws/analyze");
 
-    socket.onopen = () => {
-        output.textContent = "✅ Connected to Analysis AI...";
+    socket.onopen = () => (output.textContent = "✅ Connected to Analysis AI...");
+    socket.onmessage = e => {
+        try {
+            const data = JSON.parse(e.data);
+            output.textContent = JSON.stringify(data.analysis, null, 2);
+        } catch {
+            output.textContent = e.data;
+        }
     };
-
-    socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        output.textContent = JSON.stringify(data.analysis, null, 2);
-    };
-
-    socket.onerror = () => {
-        output.textContent = "❌ WebSocket error.";
-    };
-
-    socket.onclose = () => {
-        output.textContent += "\n⚠️ Connection closed.";
-    };
+    socket.onerror = () => (output.textContent = "❌ WebSocket error.");
+    socket.onclose = () => (output.textContent += "\n⚠️ Connection closed.");
 }
 
-// Payments
-function deposit() {
-    window.location.href = 'deposit.html';
-}
+// --- Payments ---
+function deposit() { window.location.href = 'deposit.html'; }
+function collect() { window.location.href = 'collect.html'; }
 
-function collect() {
-    window.location.href = 'collect.html';
-}
-
-// Init
+// --- Init ---
 window.addEventListener('DOMContentLoaded', () => {
+    // Ensure all IDs exist before attaching
+    const safeBind = (id, fn) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', fn);
+    };
+
+    safeBind('toggle-mode-btn', toggleMode);
+    safeBind('startBot', startBot);
+    safeBind('stopBot', stopBot);
+    safeBind('depositBtn', deposit);
+    safeBind('collectBtn', collect);
+
     initChart();
-    updateModeDisplay(); // Sets the initial mode and button text
-
-    // Attach event listeners to all buttons
-    document.getElementById('toggle-mode-btn').addEventListener('click', toggleMode);
-    document.getElementById('startBot').addEventListener('click', startBot);
-    document.getElementById('stopBot').addEventListener('click', stopBot);
-    document.getElementById('depositBtn').addEventListener('click', deposit);
-    document.getElementById('collectBtn').addEventListener('click', collect);
-
+    updateModeDisplay();
     updateStatus();
     updateLogs();
     updateBrokers();
