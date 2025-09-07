@@ -10,10 +10,13 @@ function authorizedFetch(url, options = {}) {
             'X-API-Key': API_KEY,
             ...(options.headers || {})
         }
+    }).catch(err => {
+        console.error(`Fetch error @ ${url}:`, err);
+        throw err;
     });
 }
 
-// --- Bot Controls ---
+/* ------------------ Bot Controls ------------------ */
 function startBot() {
     authorizedFetch(`${BASE}/start-bot`, { method: 'POST' })
         .then(updateStatus)
@@ -28,13 +31,17 @@ function stopBot() {
         .catch(err => console.error("Stop bot failed:", err));
 }
 
-// --- Status & Logs ---
+/* ------------------ Status & Logs ------------------ */
 function updateStatus() {
     return authorizedFetch(`${BASE}/status`)
         .then(res => res.json())
         .then(data => {
             const el = document.getElementById('bot-status');
             if (el) el.textContent = `Status: ${data.status || 'Unknown'}`;
+        })
+        .catch(() => {
+            const el = document.getElementById('bot-status');
+            if (el) el.textContent = 'Status: Error';
         });
 }
 
@@ -44,10 +51,14 @@ function updateLogs() {
         .then(data => {
             const el = document.getElementById('logs');
             if (el) el.textContent = (data.logs || []).join('\n');
+        })
+        .catch(() => {
+            const el = document.getElementById('logs');
+            if (el) el.textContent = 'Error loading logs';
         });
 }
 
-// --- Brokers ---
+/* ------------------ Brokers ------------------ */
 function updateBrokers() {
     return authorizedFetch(`${BASE}/brokers`)
         .then(res => res.json())
@@ -60,10 +71,14 @@ function updateBrokers() {
                 li.textContent = b;
                 ul.appendChild(li);
             });
+        })
+        .catch(() => {
+            const ul = document.getElementById('brokers');
+            if (ul) ul.innerHTML = '<li>Error loading brokers</li>';
         });
 }
 
-// --- Signals (now from backend instead of dummy data) ---
+/* ------------------ Signals ------------------ */
 function updateSignals() {
     return authorizedFetch(`${BASE}/signals`)
         .then(res => res.json())
@@ -77,10 +92,13 @@ function updateSignals() {
                 list.appendChild(li);
             });
         })
-        .catch(err => console.error("Signals fetch failed:", err));
+        .catch(() => {
+            const list = document.getElementById('signals');
+            if (list) list.innerHTML = '<li>Error loading signals</li>';
+        });
 }
 
-// --- Market Data (backend driven) ---
+/* ------------------ Market Data ------------------ */
 function updateMarket() {
     return authorizedFetch(`${BASE}/market`)
         .then(res => res.json())
@@ -98,16 +116,23 @@ function updateMarket() {
                 tbody.appendChild(tr);
             });
         })
-        .catch(err => console.error("Market fetch failed:", err));
+        .catch(() => {
+            const tbody = document.querySelector('#market-table tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="4">Error loading market</td></tr>';
+        });
 }
 
-// --- Profit + Wallet ---
+/* ------------------ Profit + Wallet ------------------ */
 function updateProfit() {
     return authorizedFetch(`${BASE}/profit`)
         .then(res => res.json())
         .then(data => {
             const el = document.getElementById('daily-profit');
             if (el) el.textContent = `$${data.amount || 0}`;
+        })
+        .catch(() => {
+            const el = document.getElementById('daily-profit');
+            if (el) el.textContent = '$0.00';
         });
 }
 
@@ -117,10 +142,14 @@ function updateWallet() {
         .then(data => {
             const el = document.getElementById('wallet-address');
             if (el) el.textContent = data.address || 'Unavailable';
+        })
+        .catch(() => {
+            const el = document.getElementById('wallet-address');
+            if (el) el.textContent = 'Error';
         });
 }
 
-// --- Candlestick Bar ---
+/* ------------------ Candlestick Bar ------------------ */
 function getCandleEmoji(c) {
     if (c.close > c.open) return '📈';
     if (c.close < c.open) return '📉';
@@ -129,7 +158,7 @@ function getCandleEmoji(c) {
 
 function renderCandlestickBar(candles) {
     const bar = document.getElementById('candlestick-bar');
-    if (!bar) return;
+    if (!bar || !candles || !candles.length) return;
     bar.textContent = candles.map(c => `${getCandleEmoji(c)} ${c.symbol}`).join(' ');
 }
 
@@ -140,14 +169,14 @@ function fetchCandlesticks() {
         .catch(err => console.error("Candlestick fetch failed", err));
 }
 
-// --- Chart ---
+/* ------------------ Chart ------------------ */
 function initChart() {
     const chartEl = document.getElementById('chart');
     if (!chartEl) return;
 
     const chart = LightweightCharts.createChart(chartEl, {
         width: chartEl.clientWidth,
-        height: 200,
+        height: 220,
         layout: { background: { color: '#222' }, textColor: '#DDD' },
         grid: { vertLines: { color: '#333' }, horzLines: { color: '#333' } },
         timeScale: { timeVisible: true, secondsVisible: false },
@@ -167,7 +196,7 @@ function initChart() {
         .catch(err => console.error('Chart fetch error:', err));
 }
 
-// --- Mode Switch ---
+/* ------------------ Mode Switch ------------------ */
 function updateModeDisplay() {
     return authorizedFetch(`${BASE}/mode`)
         .then(res => res.json())
@@ -185,11 +214,12 @@ function updateModeDisplay() {
                 toggleBtn.textContent = 'Switch to DEMO';
                 toggleBtn.style.background = 'dodgerblue';
             }
-        });
+        })
+        .catch(err => console.error("Mode fetch failed:", err));
 }
 
 function toggleMode() {
-    const currentMode = document.getElementById('current-mode').textContent.toLowerCase();
+    const currentMode = document.getElementById('current-mode')?.textContent.toLowerCase() || 'demo';
     const newMode = currentMode === 'demo' ? 'live' : 'demo';
 
     authorizedFetch(`${BASE}/mode?mode=${newMode}`, { method: 'POST' })
@@ -198,10 +228,11 @@ function toggleMode() {
         .catch(err => console.error('Failed to toggle mode:', err));
 }
 
-// --- WebSocket ---
+/* ------------------ WebSocket ------------------ */
 function connectAnalysisWebSocket() {
     const output = document.getElementById('ai-output');
     if (!output) return;
+
     const socket = new WebSocket("wss://aampav-backend.onrender.com/ws/analyze");
 
     socket.onopen = () => (output.textContent = "✅ Connected to Analysis AI...");
@@ -217,13 +248,12 @@ function connectAnalysisWebSocket() {
     socket.onclose = () => (output.textContent += "\n⚠️ Connection closed.");
 }
 
-// --- Payments ---
+/* ------------------ Payments ------------------ */
 function deposit() { window.location.href = 'deposit.html'; }
 function collect() { window.location.href = 'collect.html'; }
 
-// --- Init ---
+/* ------------------ Init ------------------ */
 window.addEventListener('DOMContentLoaded', () => {
-    // Ensure all IDs exist before attaching
     const safeBind = (id, fn) => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('click', fn);
