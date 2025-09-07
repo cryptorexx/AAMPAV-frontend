@@ -1,33 +1,107 @@
-<!-- deposit.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Deposit - AAMPAV</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    main { padding: 3rem; text-align: center; color: #ddd; }
-    input, button { padding: 0.6rem; font-size: 1rem; border-radius: 8px; border: none; margin: 1rem; }
-    input { width: 200px; }
-    button { background: #26a69a; color: white; }
-    .paypal-link { margin-top: 1rem; color: #26a69a; }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #0a0a0a;
+      font-family: monospace;
+      color: #ddd;
+    }
+
+    .deposit-card {
+      background: #111;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      width: 320px;
+      text-align: center;
+    }
+
+    .deposit-card h2 {
+      color: #5af;
+      margin-bottom: 1rem;
+    }
+
+    .deposit-card input {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.6rem;
+      width: 80%;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+
+    .deposit-card input:focus {
+      border-color: #5af;
+      outline: none;
+    }
+
+    .deposit-card button {
+      padding: 0.6rem;
+      width: 100%;
+      background: #26a69a;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .deposit-card button:hover {
+      background: #5af;
+      color: #000;
+    }
+
+    .paypal-link {
+      margin-top: 1rem;
+      color: #26a69a;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      display: block;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .back-link:hover {
+      color: #5af;
+    }
   </style>
 </head>
 <body>
-  <main>
+  <div class="deposit-card">
     <h2>Deposit Funds</h2>
     <input type="number" id="amount" placeholder="Enter amount $" min="1" />
     <button onclick="generatePay()">Deposit</button>
     <div class="paypal-link" id="paypal-link"></div>
-  </main>
+    <a href="index.html" class="back-link">⬅ Back to Dashboard</a>
+  </div>
 
   <script>
+    // ✅ Auth check
+    if (sessionStorage.getItem('aampav_authed') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
     function generatePay() {
       const amount = parseFloat(document.getElementById('amount').value);
-      if (!amount || amount <= 0) return alert('Enter valid amount');
-
+      if (!amount || amount <= 0) {
+        alert('Enter valid amount');
+        return;
+      }
       const link = `https://paypal.me/youraccount/${amount}`;
-      document.getElementById('paypal-link').innerHTML = `🔗 Pay now via <a href="${link}" target="_blank">PayPal</a>`;
+      document.getElementById('paypal-link').innerHTML =
+        `🔗 Pay now via <a href="${link}" target="_blank">PayPal</a>`;
     }
   </script>
 </body>
