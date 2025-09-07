@@ -1,37 +1,103 @@
-<!-- collect.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Collect Profits - AAMPAV</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    main { padding: 3rem; text-align: center; color: #ddd; }
-    button { padding: 0.6rem; font-size: 1rem; border-radius: 8px; border: none; background: #26a69a; color: white; margin-top: 1rem; }
-    .info { margin-top: 1rem; font-size: 1.2rem; }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #0a0a0a;
+      font-family: monospace;
+      color: #ddd;
+    }
+
+    .collect-card {
+      background: #111;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.7);
+      width: 320px;
+      text-align: center;
+    }
+
+    .collect-card h2 {
+      color: #5af;
+      margin-bottom: 1rem;
+    }
+
+    .collect-card button {
+      padding: 0.6rem;
+      width: 100%;
+      background: #26a69a;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 1rem;
+    }
+
+    .collect-card button:hover {
+      background: #5af;
+      color: #000;
+    }
+
+    .info {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: #eee;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      display: block;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .back-link:hover {
+      color: #5af;
+    }
   </style>
 </head>
 <body>
-  <main>
+  <div class="collect-card">
     <h2>Collect Earnings</h2>
     <div class="info" id="profit">Checking balance...</div>
     <button onclick="collectNow()">Collect Now</button>
-  </main>
+    <a href="index.html" class="back-link">⬅ Back to Dashboard</a>
+  </div>
 
   <script>
+    // ✅ Auth check
+    if (sessionStorage.getItem('aampav_authed') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
     let amount = 0;
 
     async function collectNow() {
-      if (!amount || amount <= 0) return alert("No profit to collect");
+      if (!amount || amount <= 0) {
+        alert("No profit to collect");
+        return;
+      }
 
-      const res = await fetch(`https://aampav-backend.onrender.com/pay?amount=${amount}`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-      const data = await res.json();
-      document.getElementById('profit').textContent = res.ok
-        ? '✅ Sent to your wallet!'
-        : (data.error || '❌ Collection failed');
+      try {
+        const res = await fetch(`https://aampav-backend.onrender.com/pay?amount=${amount}`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        document.getElementById('profit').textContent = res.ok
+          ? '✅ Sent to your wallet!'
+          : (data.error || '❌ Collection failed');
+      } catch (err) {
+        document.getElementById('profit').textContent = '❌ Network error';
+      }
     }
 
     async function loadProfit() {
@@ -42,13 +108,15 @@
         });
         const data = await res.json();
         amount = data.amount;
-        document.getElementById('profit').textContent = `$${amount} available to collect`;
+        document.getElementById('profit').textContent =
+          `$${amount} available to collect`;
       } catch (e) {
         document.getElementById('profit').textContent = 'Failed to load balance';
       }
     }
 
-    loadProfit(); // Call on page load
+    // Load balance on page open
+    loadProfit();
   </script>
 </body>
 </html>
