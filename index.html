@@ -1,91 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AAMPAV Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAMPAV Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
-    <div id="app">
-        <div id="candlestick-bar" class="ticker-bar">
-            Loading market data...
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1>AAMPAV</h1>
+
+      <div class="status" id="bot-status">Status: ...</div>
+
+      <div style="margin: 1rem 0;">
+        <h3>Mode: <span id="current-mode">...</span></h3>
+        <button id="toggle-mode-btn">Switch Mode</button>
+      </div>
+
+      <div class="controls">
+        <input type="number" id="depositAmount" placeholder="Amount to deposit" />
+        <button id="depositBtn">Deposit</button>
+        <button id="startBot">Start Bot</button>
+        <button id="stopBot">Stop Bot</button>
+        <button id="collectBtn">Collect</button>
+      </div>
+
+      <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
+        Wallet: <span id="wallet-address">Loading...</span>
+      </div>
+
+      <div class="logs">
+        <h2>Logs</h2>
+        <pre id="logs">Loading logs...</pre>
+      </div>
+    </aside>
+
+    <!-- Dashboard -->
+    <main class="dashboard">
+      <!-- Candlestick Ticker -->
+      <section>
+        <div id="candlestick-bar">Loading market data...</div>
+      </section>
+
+      <!-- Balance & Brokers -->
+      <section>
+        <div class="balance-container">
+          <h2>Balance</h2>
+          <p>Total: <span id="balance">$0.00</span></p>
+          <p>Daily Profit: <span id="daily-profit">$0.00</span></p>
         </div>
+        <div class="broker-container" style="margin-top: 1rem;">
+          <h2>Brokers Connected</h2>
+          <p><span id="brokers-count">0</span> active</p>
+          <ul id="brokers"></ul>
+        </div>
+      </section>
 
-        <main class="main-content">
-            <div class="header-container">
-                <div class="balance-container">
-                    <h1>Balance: <span id="balance">$0.00</span></h1>
-                    <p>Daily Profit: <span id="daily-profit">$0.00</span></p>
-                </div>
-                <div class="broker-container">
-                    <p>Brokers connected: <span id="brokers-count">0</span></p>
-                    <ul id="brokers"></ul>
-                </div>
-            </div>
+      <!-- Chart -->
+      <section>
+        <h2>Market Chart</h2>
+        <div id="chart" class="chart-box"></div>
+      </section>
 
-            <div class="chart-container">
-                <div id="chart" style="width: 100%; height: 400px;"></div>
-            </div>
+      <!-- AI Output & Signals -->
+      <section>
+        <h2>AI Output</h2>
+        <pre id="ai-output">Waiting for analysis...</pre>
+      </section>
 
-            <div class="content-row">
-                <div class="content-box">
-                    <h2>AI Output</h2>
-                    <pre id="ai-output">Waiting for analysis...</pre>
-                </div>
+      <section>
+        <h2>Signals</h2>
+        <ul id="signals"></ul>
+      </section>
 
-                <div class="content-box">
-                    <h2>Signals</h2>
-                    <ul id="signals"></ul>
-                </div>
-            </div>
+      <!-- Market Data -->
+      <section>
+        <h2>Market Data</h2>
+        <table id="market-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Price</th>
+              <th>Change</th>
+              <th>Volume</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
 
-            <div class="content-box market-data">
-                <h2>Market Data</h2>
-                <table id="market-table">
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Price</th>
-                            <th>Change</th>
-                            <th>Volume</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </main>
-
-        <aside class="sidebar">
-            <h1>AAMPAV</h1>
-
-            <div style="margin: 1rem 0;">
-                <h3>Mode: <span id="current-mode" style="font-weight: normal;">...</span></h3>
-                <button id="toggle-mode-btn" style="padding: 0.5rem 1rem; font-weight: bold; border-radius: 10px; border: none; color: white;"></button>
-            </div>
-
-            <div id="bot-status" class="status">Status: ...</div>
-
-            <div class="controls">
-                <input type="number" id="depositAmount" placeholder="Amount to deposit" style="margin-bottom: 10px;" />
-                <button id="depositBtn">Deposit</button>
-                <button id="startBot">Start Bot</button>
-                <button id="stopBot">Stop Bot</button>
-                <button id="collectBtn">Collect</button>
-            </div>
-
-            <div style="margin-top: 2rem; font-size: 0.9rem; color: #aaa;">
-                Wallet: <span id="wallet-address">Loading...</span>
-            </div>
-
-            <div class="logs">
-                <h2>Logs</h2>
-                <pre id="logs">Loading logs...</pre>
-            </div>
-        </aside>
-    </div>
-    <script src="script.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // ✅ Redirect to login if not authenticated
+    if (sessionStorage.getItem('aampav_authed') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
 </body>
 </html>
